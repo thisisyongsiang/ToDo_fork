@@ -1,0 +1,22 @@
+:host{
+  display :block;
+  margin-top : 10px;
+}
+
+.TaskInfo{
+  text-align: center;
+}
+time{
+  vertical-align: center;
+  color:darkgrey;
+  font-style: italic;
+}
+.taskCompleted{
+  color:darkgrey;
+  text-decoration: line-through;
+}
+#deleteButton{
+  position: absolute;
+  right: 1rem;
+}
+

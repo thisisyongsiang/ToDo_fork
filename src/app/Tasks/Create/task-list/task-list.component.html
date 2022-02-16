@@ -1,0 +1,26 @@
+<!-- <mat-accordion multi="true" *ngIf="taskList.length>0">
+  <mat-expansion-panel *ngFor="let task of taskList">
+    <mat-expansion-panel-header>
+      {{task['title']}}
+    </mat-expansion-panel-header>
+    <p>{{task['dateTime']}}</p>
+  </mat-expansion-panel>
+</mat-accordion>
+<p class="TaskInfo mat-body-2" *ngIf="taskList.length<=0">
+  No Tasks Available!
+</p> -->
+
+<mat-selection-list [multiple]="false">
+  <mat-list-option id = 'listItem' *ngFor="let task of taskList" (click)="onClick(task)" [value]="task">
+
+    <div [ngClass]="task.completed? 'taskCompleted':'taskNotCompleted'">{{task["title"]}}</div>
+    <time>{{task['dateTime']}}</time>
+    <button id="deleteButton"
+    mat-icon-button color="primary"
+    aria-label="Example icon button with a delete icon"
+    (click)="DeleteTask(task)">
+      <mat-icon >delete</mat-icon>
+    </button>
+  </mat-list-option>
+</mat-selection-list>
+<p *ngIf="taskList.length>0">{{ numberNonCompletedTask }} Tasks Pending</p>

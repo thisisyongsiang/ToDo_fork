@@ -1,0 +1,19 @@
+
+<mat-card>
+  <mat-form-field>
+    <input
+    (keyup.enter)="onCreateTask()"
+    matInput
+    placeholder="Input Task To Do Here"
+    [(ngModel)]="inputTask"
+    >
+  </mat-form-field>
+  <button
+
+  color ='primary'
+  mat-stroked-button
+  (click)="onCreateTask()">Create Task
+  </button>
+</mat-card>
+
+
