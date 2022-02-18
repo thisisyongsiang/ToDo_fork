@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose=require('mongoose');
 const Task =require('./models/task');
 const app=express();
+const { v4: uuidv4 } = require('uuid');
 
 mongoose.connect("mongodb+srv://user:user@yscluster.j8iq2.mongodb.net/ToDo?retryWrites=true&w=majority")
 .then(()=>{
@@ -31,15 +32,17 @@ app.use((req,res,next)=>{
 
 //post tasks to database
 app.post('/',(req,res,next)=>{
+  id=uuidv4();
   const task=new Task({
     title:req.body.title,
-    dateTime:req.body.dateTime,
-    completed:req.body.completed
+    dateTime:req.body.dateTime?req.body.dateTime:null,
+    completed:req.body.completed?req.body.completed:false,
+    url:'http://'+req.get('host')+'/' + id,
+    id:id,
+    order:req.body.order?req.body.order:null
   });
   task.save().then(result=>{
-    res.status(200).json({
-      message:"post requested made",
-      taskId:result._id});
+    res.status(200).json(result);
   });
 });
 
@@ -47,49 +50,73 @@ app.post('/',(req,res,next)=>{
 app.get('/',(req,res,next)=>{
   Task.find()
   .then(result=>{
-    res.status(200).json({
-    message:'posts fetched',
-    tasks:result
-    });
+    res.status(200).json(result);
   })
 })
 
+//get specific task on database
+app.get('/:id',(req,res,next)=>{
+
+  console.log('getone');
+  Task.findOne({id:req.params.id})
+  .then(result=>{
+    console.log(result);
+    res.status(200).json(result);
+  })
+})
 //delete tasks on database
 //:id is a dynamic path segment to identify what to delete
 app.delete('/:id',(req,res,next)=>{
-  Task.deleteOne({_id:req.params.id})
-  .then(result=>{
+  Task.deleteOne({id:req.params.id})
+  .then(()=>{
     res.status(200).json({message:"task Deleted"});
   });
 
 })
-app.delete('/',(req,res,next)=>{
+
+//delete only completed Task
+app.delete('/completed',(req,res,next)=>{
   Task.deleteMany({completed:true})
-  .then(result=>{
+  .then(()=>{
+    res.status(200).json({messgae:"cleared completed tasks"});
+  })
+})
+
+//delete ALL tasks
+app.delete('/',(req,res,next)=>{
+  Task.deleteMany()
+  .then(()=>{
     res.status(200).json({messgae:"cleared completed tasks"});
   })
 })
 //use put request to update to database
-app.put('/:id',(req,res,next)=>{
-  console.log(req.body);
-  const updatedTask=new Task({
-    _id:req.body.id,
-    title:req.body.title,
-    dateTime:req.body.dateTime,
-    completed:req.body.completed
-  });
-  Task.updateOne({_id: req.params.id},updatedTask)
-  .then(result=>{
-    res.status(200).json({message:"Task Updated"});
-  });
-})
-app.patch('/',(req,res,next)=>{
-  console.log(req.body);
+// app.put('/:id',(req,res,next)=>{
+//   const updatedTask=new Task({
+//     _id:req.body.id,
+//     title:req.body.title,
+//     dateTime:req.body.dateTime,
+//     completed:req.body.completed
+//   });
+//   Task.updateOne({_id: req.params.id},updatedTask)
+//   .then(result=>{
+//     res.status(200).json({message:"Task Updated"});
+//   });
+// })
+//patch to database to update all completion status
+app.patch('/completed',(req,res,next)=>{
   allComplete=req.body.allComplete;
   Task.updateMany({completed:!allComplete},{completed:allComplete})
-  .then(result=>{
+  .then((result)=>{
     res.status(200).json({message:"many Task Updated"});
   });
 })
 
+app.patch('/:id',(req,res,next)=>{
+
+  const updates=req.body;
+
+  Task.findOneAndUpdate({id:req.params.id},updates,{new:true},(err,doc)=>{
+        res.status(200).json(doc);
+    })
+})
 module.exports=app;

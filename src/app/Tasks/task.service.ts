@@ -79,7 +79,7 @@ export class TaskService {
   }
   //if allcomplete is true, make all task completed, else make all task uncompleted
   CompleteAllTask(allComplete:boolean){
-    this.httpClient.patch("http://localhost:3000",{allComplete})
+    this.httpClient.patch("http://localhost:3000/",{allComplete})
     .subscribe((res)=>{
       this.tasks.forEach(task => {
         task.completed=allComplete;
@@ -89,7 +89,7 @@ export class TaskService {
   }
   DeleteCompletedTask(){
     console.log('ge');
-    this.httpClient.delete("http://localhost:3000")
+    this.httpClient.delete("http://localhost:3000/completed")
     .subscribe(()=>{
       const updatedTaskList =this.tasks.filter(t=>!t.completed);
       this.tasks=updatedTaskList;
