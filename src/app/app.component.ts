@@ -10,14 +10,5 @@ import { platformBrowser } from '@angular/platform-browser';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  ngOnInit(): void {
-    if(!document.cookie){
-      document.cookie="username = "+uuid();
-      console.log('set cookie');
-    }
-    console.log(document.cookie);
-    console.log('which cookie');
 
-    document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  }
 }

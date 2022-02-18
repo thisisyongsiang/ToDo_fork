@@ -45,7 +45,6 @@ app.post('/',(req,res,next)=>{
 
 //get tasks on database
 app.get('/',(req,res,next)=>{
-  console.log('gettting');
   Task.find()
   .then(result=>{
     res.status(200).json({
