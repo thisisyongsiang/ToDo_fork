@@ -1,26 +1,62 @@
-<!-- <mat-accordion multi="true" *ngIf="taskList.length>0">
-  <mat-expansion-panel *ngFor="let task of taskList">
-    <mat-expansion-panel-header>
-      {{task['title']}}
-    </mat-expansion-panel-header>
-    <p>{{task['dateTime']}}</p>
-  </mat-expansion-panel>
-</mat-accordion>
-<p class="TaskInfo mat-body-2" *ngIf="taskList.length<=0">
-  No Tasks Available!
-</p> -->
 
-<mat-selection-list [multiple]="false">
-  <mat-list-option id = 'listItem' *ngFor="let task of taskList" (click)="onClick(task)" [value]="task">
+<ul class="list-group">
+  <li class="list-group-item" id = 'listItem' *ngFor="let task of taskListToDisplay"
+  [ngClass]="task.completed? 'taskCompleted':'taskNotCompleted'"
+    [value]="task"
+    (dblclick)="onDoubleClick(task)">
+    <input class="form-check-input me-1" type="checkbox" value=""
+    [(ngModel)]="task.completed"
+    (change)="onTaskStatusChange(task)" >
+        <span *ngIf = "taskToEdit!=task; else elseBlockInput">
+          {{task["title"]}}
+          <time>
+            {{task['dateTime']}}
+          </time>
+          <button id="deleteButton"
+            class="btn btn-primary float-end"
+            (click)="DeleteTask(task)">
+            Delete
+        </button>
+    </span>
+    <ng-template #elseBlockInput>
+        <input type="text" class="taskEditor"
+        [value]="task.title" (blur)="onInputBlur()"
+        [(ngModel)]="taskTitleToEdit"
+        (keyup.enter)="onEnterEdit()"
+        #editTask
+        >
+    </ng-template>
 
-    <div [ngClass]="task.completed? 'taskCompleted':'taskNotCompleted'">{{task["title"]}}</div>
-    <time>{{task['dateTime']}}</time>
-    <button id="deleteButton"
-    mat-icon-button color="primary"
-    aria-label="Example icon button with a delete icon"
-    (click)="DeleteTask(task)">
-      <mat-icon >delete</mat-icon>
-    </button>
-  </mat-list-option>
-</mat-selection-list>
-<p *ngIf="taskList.length>0">{{ numberNonCompletedTask }} Tasks Pending</p>
+  </li>
+</ul>
+<span *ngIf="taskList.length>0">
+  {{ numberNonCompletedTask }} Tasks Pending
+
+<span id = 'filterButtons'  >
+    <input  type="radio" class="btn-check" id="all-check-outlined" autocomplete="off"
+    name="displayFilter" value = all
+    [(ngModel)]="displayFilter" (change)="onDisplayFilterChange()">
+  <label class="btn btn-outline-secondary" for="all-check-outlined">All</label>
+</span>
+<span id = 'filterButtons'  >
+    <input  type="radio" class="btn-check" id="active-check-outlined" autocomplete="off"
+    name="displayFilter" value = active
+    [(ngModel)]="displayFilter"(change)="onDisplayFilterChange()" >
+  <label class="btn btn-outline-secondary" for="active-check-outlined">Active</label>
+</span>
+
+<span id = 'filterButtons'  >
+  <input  type="radio" class="btn-check" id="complete-check-outlined" autocomplete="off"
+  name="displayFilter" value = completed
+  [(ngModel)]="displayFilter"(change)="onDisplayFilterChange()">
+  <label class="btn btn-outline-secondary" for="complete-check-outlined">Complete</label>
+</span>
+
+<span id = 'filterButtons' *ngIf="numberOfCompleted!=0">
+  <button type="button" class="btn btn-outline-secondary float-end"
+  (click)="onClearCompleted()">Clear Completed</button>
+</span>
+
+
+</span>
+

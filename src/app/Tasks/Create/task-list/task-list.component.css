@@ -10,13 +10,33 @@ time{
   vertical-align: center;
   color:darkgrey;
   font-style: italic;
+  font-size: smaller;
+  position: relative;
+  right:0;
 }
 .taskCompleted{
   color:darkgrey;
   text-decoration: line-through;
 }
-#deleteButton{
-  position: absolute;
-  right: 1rem;
+
+.list-group-item {
+  word-wrap: break-word;
+  white-space:normal;
+  font-size: large;
 }
+
+.list-group-item #checkbox{
+  display: inline-block;
+  vertical-align: middle;
+  padding:0.2rem 0.2rem;
+}
+.taskEditor{
+  width:90%;
+  border-radius:2px;
+}
+#filterButtons{
+  border-radius: 2px;
+  margin:2px 2px;
+}
+
 

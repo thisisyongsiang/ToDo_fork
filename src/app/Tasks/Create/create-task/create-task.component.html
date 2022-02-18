@@ -1,19 +1,26 @@
 
-<mat-card>
-  <mat-form-field>
-    <input
-    (keyup.enter)="onCreateTask()"
-    matInput
-    placeholder="Input Task To Do Here"
-    [(ngModel)]="inputTask"
-    >
-  </mat-form-field>
-  <button
+  <div class="input-group input-group-lg">
+    <div class="input-group-text">
+      <input class="form-check-input mt-0" type="checkbox" value=""
+      aria-label="Checkbox for following text input"
+      [(ngModel)]="allCompleted"
+      (ngModelChange)="onCheckBoxChanged()"
+      >
+    </div>
 
-  color ='primary'
-  mat-stroked-button
-  (click)="onCreateTask()">Create Task
-  </button>
-</mat-card>
+    <input type="text" class="form-control"
+    placeholder="Input Task To Do Here"
+    aria-label="Tasks" aria-describedby="basic-addon1"
+    [(ngModel)]="inputTask"
+    (keyup.enter)="onCreateTask()">
+
+    <button id="CreateTask"
+    class="btn btn-primary float-end"
+    (click)="onCreateTask()"
+    >
+    CreateTask
+    </button>
+  </div>
+
 
 

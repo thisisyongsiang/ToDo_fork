@@ -9,12 +9,14 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatListModule} from '@angular/material/list';
 import {MatIconModule} from '@angular/material/icon';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {CreateTaskComponent} from './Tasks/Create/create-task/create-task.component';
 import { HeaderComponent } from './Header/header.component';
 import { TaskListComponent } from './Tasks/Create/task-list/task-list.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,6 +25,7 @@ import { TaskListComponent } from './Tasks/Create/task-list/task-list.component'
     TaskListComponent
   ],
   imports: [
+    HttpClientModule,
     BrowserModule,
     AppRoutingModule,
     FormsModule,
@@ -33,7 +36,8 @@ import { TaskListComponent } from './Tasks/Create/task-list/task-list.component'
     MatToolbarModule,
     MatExpansionModule,
     MatListModule,
-    MatIconModule
+    MatIconModule,
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]

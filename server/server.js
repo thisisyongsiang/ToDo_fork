@@ -1,5 +1,5 @@
 const http=require("http");
-const app=require('./server/app');
+const app=require('./app');
 const debug =require('debug');
 const chkPort=val=>{
   let port =parseInt(val,10);
@@ -12,7 +12,6 @@ const chkPort=val=>{
 
 const onListening = ()=>{
    const addr= server.address();
-
    debug('listening on port ' +port);
 }
 //listen to provided port or else use port 3000
