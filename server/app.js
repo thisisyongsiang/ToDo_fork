@@ -30,7 +30,7 @@ app.use((req,res,next)=>{
 })
 
 //post tasks to database
-app.post('/api/tasks',(req,res,next)=>{
+app.post('/',(req,res,next)=>{
   const task=new Task({
     title:req.body.title,
     dateTime:req.body.dateTime,
@@ -44,7 +44,7 @@ app.post('/api/tasks',(req,res,next)=>{
 });
 
 //get tasks on database
-app.get('/api/tasks',(req,res,next)=>{
+app.get('/',(req,res,next)=>{
   console.log('gettting');
   Task.find()
   .then(result=>{
@@ -57,21 +57,21 @@ app.get('/api/tasks',(req,res,next)=>{
 
 //delete tasks on database
 //:id is a dynamic path segment to identify what to delete
-app.delete('/api/tasks/:id',(req,res,next)=>{
+app.delete('/:id',(req,res,next)=>{
   Task.deleteOne({_id:req.params.id})
   .then(result=>{
     res.status(200).json({message:"task Deleted"});
   });
 
 })
-app.delete('/api/tasks',(req,res,next)=>{
+app.delete('/',(req,res,next)=>{
   Task.deleteMany({completed:true})
   .then(result=>{
     res.status(200).json({messgae:"cleared completed tasks"});
   })
 })
 //use put request to update to database
-app.put('/api/tasks/:id',(req,res,next)=>{
+app.put('/:id',(req,res,next)=>{
   console.log(req.body);
   const updatedTask=new Task({
     _id:req.body.id,
@@ -84,7 +84,7 @@ app.put('/api/tasks/:id',(req,res,next)=>{
     res.status(200).json({message:"Task Updated"});
   });
 })
-app.patch('/api/tasks/',(req,res,next)=>{
+app.patch('/',(req,res,next)=>{
   console.log(req.body);
   allComplete=req.body.allComplete;
   Task.updateMany({completed:!allComplete},{completed:allComplete})
