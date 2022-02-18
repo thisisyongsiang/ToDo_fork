@@ -75,9 +75,10 @@ app.delete('/:id',(req,res,next)=>{
 })
 
 //delete only completed Task
-app.delete('/completed',(req,res,next)=>{
+app.delete('/task/completed',(req,res,next)=>{
   Task.deleteMany({completed:true})
   .then(()=>{
+    console.log('deleting');
     res.status(200).json({messgae:"cleared completed tasks"});
   })
 })
@@ -89,19 +90,7 @@ app.delete('/',(req,res,next)=>{
     res.status(200).json({messgae:"cleared completed tasks"});
   })
 })
-//use put request to update to database
-// app.put('/:id',(req,res,next)=>{
-//   const updatedTask=new Task({
-//     _id:req.body.id,
-//     title:req.body.title,
-//     dateTime:req.body.dateTime,
-//     completed:req.body.completed
-//   });
-//   Task.updateOne({_id: req.params.id},updatedTask)
-//   .then(result=>{
-//     res.status(200).json({message:"Task Updated"});
-//   });
-// })
+
 //patch to database to update all completion status
 app.patch('/completed',(req,res,next)=>{
   allComplete=req.body.allComplete;
@@ -109,6 +98,7 @@ app.patch('/completed',(req,res,next)=>{
   .then((result)=>{
     res.status(200).json({message:"many Task Updated"});
   });
+
 })
 
 app.patch('/:id',(req,res,next)=>{

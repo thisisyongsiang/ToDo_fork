@@ -15,22 +15,22 @@ export class TaskService {
 
   //get task from server
   getTasks(){
-    this.httpClient.get<{message:string,tasks: any[]}>
+    this.httpClient.get<Task[]>
     ('http://localhost:3000/')
-    .pipe(map(data=>{
-      return data.tasks.map(task=>{
-        return {
+    .pipe(map(res=>{
+      return res.map(task=>{
+        return{
           title:task.title,
           dateTime:task.dateTime,
           completed:task.completed,
-          id:task._id
-        };
-      });
+          id:task.id
+        }
+      })
     }))
-    .subscribe((mappedData)=>{
-      this.tasks=mappedData;
+    .subscribe(data=>{
+      this.tasks=data;
       this.taskIsUpdated.next([...this.tasks]);
-    });
+    })
   }
   getTaskIsUpdatedListener(){
     return this.taskIsUpdated.asObservable();
@@ -48,11 +48,10 @@ export class TaskService {
     //add newly created task in server
   addTasksTitleDateTime(taskInfo:string,dateTime:string){
     const task:Task = {id:"",title:taskInfo,dateTime:dateTime,completed:false};
-    this.httpClient.post<{message:string,taskId:string}>
+    this.httpClient.post<{id:string}>
     ('http://localhost:3000',task)
     .subscribe((res)=>{
-      console.log(res.message);
-      task.id=res.taskId;
+      task.id=res.id;
       this.tasks.push(task);
       this.taskIsUpdated.next([...this.tasks]);
     });
@@ -70,7 +69,7 @@ export class TaskService {
   }
   //Update Task i.e. change status of task in server
   UpdateTask(task:Task){
-    this.httpClient.put("http://localhost:3000/"+task.id,task)
+    this.httpClient.patch("http://localhost:3000/"+task.id,task)
     .subscribe((res)=>{
       const updatedTaskIndex=this.tasks.findIndex(t=>t.id===task.id);
       this.tasks[updatedTaskIndex]=task;
@@ -79,7 +78,7 @@ export class TaskService {
   }
   //if allcomplete is true, make all task completed, else make all task uncompleted
   CompleteAllTask(allComplete:boolean){
-    this.httpClient.patch("http://localhost:3000/",{allComplete})
+    this.httpClient.patch("http://localhost:3000/completed",{allComplete})
     .subscribe((res)=>{
       this.tasks.forEach(task => {
         task.completed=allComplete;
@@ -88,8 +87,9 @@ export class TaskService {
     });
   }
   DeleteCompletedTask(){
-    console.log('ge');
-    this.httpClient.delete("http://localhost:3000/completed")
+
+    console.log('deleting');
+    this.httpClient.delete("http://localhost:3000/task/completed")
     .subscribe(()=>{
       const updatedTaskList =this.tasks.filter(t=>!t.completed);
       this.tasks=updatedTaskList;
