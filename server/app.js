@@ -4,7 +4,7 @@ const mongoose=require('mongoose');
 const Task =require('./models/task');
 const app=express();
 const { v4: uuidv4 } = require('uuid');
-const UserStat=require('./models/UserStats');
+const UserStat=require('./models/userStats');
 
 let userStat=null;
 mongoose.connect("mongodb+srv://user:user@yscluster.j8iq2.mongodb.net/ToDo?retryWrites=true&w=majority")
@@ -59,30 +59,33 @@ app.post('/:user',(req,res,next)=>{
 //get tasks on database
 //creates or get user model from database to log stats of user
 app.get('/user/:user',(req,res,next)=>{
-
   Task.find({user:req.params.user})
   .then(result=>{
     UserStat.find({user:req.params.user})
     .then(user=>{
+      let createUser=false;
       if(user.length==0){
-        console.log('hi');
+        createUser=true;
         this.userStat=new UserStat({
           user:req.params.user,
           deleted:0,
           created:0,
         });
-        this.userStat.save().then(result=>{
-          res.status(200).json(result);
+        this.userStat.save().then((us)=>{
+          this.userStat=[us];
+          res.status(200).json(result)
         });
       }
       else this.userStat=user;
-      console.log(this.userStat);
+      return [result,createUser];
     })
-    return result;
+    .then(result=>{
+      if(!result[1]){
+        res.status(200).json(result[0]);
+      }
+    })
   })
-  .then(result=>{
-    res.status(200).json(result);
-  })
+
 })
 
 //get specific task on database
@@ -93,6 +96,10 @@ app.get('/user/:user/:id',(req,res,next)=>{
     res.status(200).json(result);
   })
 })
+
+
+
+
 //delete tasks on database
 //:id is a dynamic path segment to identify what to delete
 app.delete('/:user/:id',(req,res,next)=>{
