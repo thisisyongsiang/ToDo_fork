@@ -11,12 +11,16 @@ import {CreateTaskComponent} from './Tasks/Create/create-task/create-task.compon
 import { HeaderComponent } from './Header/header.component';
 import { TaskListComponent } from './Tasks/Create/task-list/task-list.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { RouterModule } from '@angular/router';
+import { AdminViewComponent } from './Admin/admin-view/admin-view.component';
+
 @NgModule({
   declarations: [
     AppComponent,
     CreateTaskComponent,
     HeaderComponent,
-    TaskListComponent
+    TaskListComponent,
+    AdminViewComponent
   ],
   imports: [
     HttpClientModule,
@@ -24,7 +28,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     AppRoutingModule,
     FormsModule,
     BrowserAnimationsModule,
-    NgbModule
+    NgbModule,
+    RouterModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -4,7 +4,6 @@ import { v4 as uuid } from 'uuid';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { platformBrowser } from '@angular/platform-browser';
 import { TaskService } from './Tasks/task.service';
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

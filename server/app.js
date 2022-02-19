@@ -4,7 +4,9 @@ const mongoose=require('mongoose');
 const Task =require('./models/task');
 const app=express();
 const { v4: uuidv4 } = require('uuid');
+const UserStat=require('./models/UserStats');
 
+let userStat=null;
 mongoose.connect("mongodb+srv://user:user@yscluster.j8iq2.mongodb.net/ToDo?retryWrites=true&w=majority")
 .then(()=>{
   console.log('connected to mongodb');
@@ -31,6 +33,7 @@ app.use((req,res,next)=>{
 })
 
 //post tasks to database
+//upon post, add 1 to the property created in userStat model
 app.post('/:user',(req,res,next)=>{
   id=uuidv4();
   const task=new Task({
@@ -42,21 +45,48 @@ app.post('/:user',(req,res,next)=>{
     id:id,
     order:req.body.order?req.body.order:null
   });
-  task.save().then(result=>{
-    res.status(200).json(result);
-  });
+  task.save()
+  .then(result=>{
+    this.userStat[0].created=this.userStat[0].created+1;
+    UserStat.findOneAndUpdate
+    ({user:this.userStat[0].user},{created:this.userStat[0].created})
+    .then(()=>{
+      res.status(200).json(result);
+    });
+  })
 });
 
 //get tasks on database
-app.get('/:user',(req,res,next)=>{
+//creates or get user model from database to log stats of user
+app.get('/user/:user',(req,res,next)=>{
+
   Task.find({user:req.params.user})
+  .then(result=>{
+    UserStat.find({user:req.params.user})
+    .then(user=>{
+      if(user.length==0){
+        console.log('hi');
+        this.userStat=new UserStat({
+          user:req.params.user,
+          deleted:0,
+          created:0,
+        });
+        this.userStat.save().then(result=>{
+          res.status(200).json(result);
+        });
+      }
+      else this.userStat=user;
+      console.log(this.userStat);
+    })
+    return result;
+  })
   .then(result=>{
     res.status(200).json(result);
   })
 })
 
 //get specific task on database
-app.get('/:user/:id',(req,res,next)=>{
+app.get('/user/:user/:id',(req,res,next)=>{
 
   Task.findOne({id:req.params.id,user:req.params.user})
   .then(result=>{
@@ -68,7 +98,12 @@ app.get('/:user/:id',(req,res,next)=>{
 app.delete('/:user/:id',(req,res,next)=>{
   Task.deleteOne({id:req.params.id,user:req.params.user})
   .then(()=>{
-    res.status(200).json({message:"task Deleted"});
+    this.userStat[0].deleted = this.userStat[0].deleted+1;
+    UserStat.findOneAndUpdate
+    ({user:this.userStat[0].user},{deleted:this.userStat[0].deleted})
+    .then(()=>{
+      res.status(200).json({message:"task Deleted"});
+    });
   });
 
 })
@@ -76,17 +111,26 @@ app.delete('/:user/:id',(req,res,next)=>{
 //delete only completed Task
 app.delete('/:user/task/completed',(req,res,next)=>{
   Task.deleteMany({completed:true,user:req.params.user})
-  .then(()=>{
-    console.log('deleting');
-    res.status(200).json({messgae:"cleared completed tasks"});
+  .then((result)=>{
+    this.userStat[0].deleted = this.userStat[0].deleted+result.deletedCount;
+    UserStat.findOneAndUpdate
+    ({user:this.userStat[0].user},{deleted:this.userStat[0].deleted})
+    .then(()=>{
+      res.status(200).json({messgae:"cleared completed tasks"});
+    })
   })
 })
 
 //delete ALL tasks
 app.delete('/:user',(req,res,next)=>{
   Task.deleteMany({user:req.params.user})
-  .then(()=>{
-    res.status(200).json({messgae:"cleared completed tasks"});
+  .then((result)=>{
+    this.userStat[0].deleted = this.userStat[0].deleted+result.deletedCount;
+    UserStat.findOneAndUpdate
+    ({user:this.userStat[0].user},{deleted:this.userStat[0].deleted})
+    .then(()=>{
+      res.status(200).json({messgae:"cleared all tasks"});
+    })
   })
 })
 
@@ -101,11 +145,19 @@ app.patch('/:user/completed',(req,res,next)=>{
 
 })
 
+//update task info
 app.patch('/:user/:id',(req,res,next)=>{
-  const updates=req.body;
   Task.findOneAndUpdate({id:req.params.id,user:req.params.user}
-    ,updates,{new:true},(err,doc)=>{
+    ,req.body,{new:true},(err,doc)=>{
         res.status(200).json(doc);
     })
 })
+
+//get user info
+app.get('/admin/users',(req,res,next)=>{
+  UserStat.find().then(result=>{
+    res.status(200).json(result);
+  })
+})
+
 module.exports=app;

@@ -4,7 +4,9 @@ import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { ThisReceiver } from '@angular/compiler';
+import { environment } from 'src/environments/environment';
 
+const apiUrl=environment.apiUrl
 @Injectable({
   providedIn: 'root'
 })
@@ -16,7 +18,7 @@ export class TaskService {
   //get task from server
   getTasks(){
     this.httpClient.get<Task[]>
-    ('http://localhost:3000/'+this.user)
+    (apiUrl+'user/'+this.user)
     .pipe(map(res=>{
       return res.map(task=>{
         return{
@@ -32,6 +34,8 @@ export class TaskService {
       this.taskIsUpdated.next([...this.tasks]);
     })
   }
+
+
   getTaskIsUpdatedListener(){
     return this.taskIsUpdated.asObservable();
   }
@@ -39,7 +43,7 @@ export class TaskService {
   addTasks(task:Task){
     this.tasks.push(task);
     this.httpClient.post<{message:string}>
-    ('http://localhost:3000/'+this.user,task)
+    (apiUrl+this.user,task)
     .subscribe((res)=>{
       this.tasks.push(task);
       this.taskIsUpdated.next([...this.tasks]);
@@ -49,7 +53,7 @@ export class TaskService {
   addTasksTitleDateTime(taskInfo:string,dateTime:string){
     const task:Task = {id:"",title:taskInfo,dateTime:dateTime,completed:false};
     this.httpClient.post<{id:string}>
-    ('http://localhost:3000/'+this.user,task)
+    (apiUrl+this.user,task)
     .subscribe((res)=>{
       task.id=res.id;
       this.tasks.push(task);
@@ -58,7 +62,7 @@ export class TaskService {
   }
   //delete task from server
   DeleteTask(task:Task){
-    this.httpClient.delete("http://localhost:3000/"+this.user+'/'+task.id)
+    this.httpClient.delete(apiUrl+this.user+'/'+task.id)
     .subscribe(()=>{
       // this.tasks.forEach(x=>{console.log(x.id)});
       const updatedTaskList =this.tasks.filter(t=>t.id!==task.id);
@@ -69,7 +73,7 @@ export class TaskService {
   }
   //Update Task i.e. change status of task in server
   UpdateTask(task:Task){
-    this.httpClient.patch("http://localhost:3000/"+this.user+'/'+task.id,task)
+    this.httpClient.patch(apiUrl+this.user+'/'+task.id,task)
     .subscribe((res)=>{
       const updatedTaskIndex=this.tasks.findIndex(t=>t.id===task.id);
       this.tasks[updatedTaskIndex]=task;
@@ -78,7 +82,7 @@ export class TaskService {
   }
   //if allcomplete is true, make all task completed, else make all task uncompleted
   CompleteAllTask(allComplete:boolean){
-    this.httpClient.patch("http://localhost:3000/"+this.user+"/completed",
+    this.httpClient.patch(apiUrl+this.user+"/completed",
     {allComplete})
     .subscribe((res)=>{
       this.tasks.forEach(task => {
@@ -88,9 +92,7 @@ export class TaskService {
     });
   }
   DeleteCompletedTask(){
-
-    console.log('deleting');
-    this.httpClient.delete("http://localhost:3000/"+this.user+"/task/completed")
+    this.httpClient.delete(apiUrl+this.user+"/task/completed")
     .subscribe(()=>{
       const updatedTaskList =this.tasks.filter(t=>!t.completed);
       this.tasks=updatedTaskList;

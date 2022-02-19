@@ -90,7 +90,9 @@ export class TaskListComponent implements OnInit ,OnDestroy {
     }
   }
   //this is called everytime view is changed
+
   ngAfterViewChecked(){
+    //this ensures that the edit task input box is in focus when created
     if(this.editTask){
       this.editTask.nativeElement.focus();
     }
