@@ -31,9 +31,10 @@ app.use((req,res,next)=>{
 })
 
 //post tasks to database
-app.post('/',(req,res,next)=>{
+app.post('/:user',(req,res,next)=>{
   id=uuidv4();
   const task=new Task({
+    user:req.params.user,
     title:req.body.title,
     dateTime:req.body.dateTime?req.body.dateTime:null,
     completed:req.body.completed?req.body.completed:false,
@@ -47,27 +48,25 @@ app.post('/',(req,res,next)=>{
 });
 
 //get tasks on database
-app.get('/',(req,res,next)=>{
-  Task.find()
+app.get('/:user',(req,res,next)=>{
+  Task.find({user:req.params.user})
   .then(result=>{
     res.status(200).json(result);
   })
 })
 
 //get specific task on database
-app.get('/:id',(req,res,next)=>{
+app.get('/:user/:id',(req,res,next)=>{
 
-  console.log('getone');
-  Task.findOne({id:req.params.id})
+  Task.findOne({id:req.params.id,user:req.params.user})
   .then(result=>{
-    console.log(result);
     res.status(200).json(result);
   })
 })
 //delete tasks on database
 //:id is a dynamic path segment to identify what to delete
-app.delete('/:id',(req,res,next)=>{
-  Task.deleteOne({id:req.params.id})
+app.delete('/:user/:id',(req,res,next)=>{
+  Task.deleteOne({id:req.params.id,user:req.params.user})
   .then(()=>{
     res.status(200).json({message:"task Deleted"});
   });
@@ -75,8 +74,8 @@ app.delete('/:id',(req,res,next)=>{
 })
 
 //delete only completed Task
-app.delete('/task/completed',(req,res,next)=>{
-  Task.deleteMany({completed:true})
+app.delete('/:user/task/completed',(req,res,next)=>{
+  Task.deleteMany({completed:true,user:req.params.user})
   .then(()=>{
     console.log('deleting');
     res.status(200).json({messgae:"cleared completed tasks"});
@@ -84,28 +83,28 @@ app.delete('/task/completed',(req,res,next)=>{
 })
 
 //delete ALL tasks
-app.delete('/',(req,res,next)=>{
-  Task.deleteMany()
+app.delete('/:user',(req,res,next)=>{
+  Task.deleteMany({user:req.params.user})
   .then(()=>{
     res.status(200).json({messgae:"cleared completed tasks"});
   })
 })
 
 //patch to database to update all completion status
-app.patch('/completed',(req,res,next)=>{
+app.patch('/:user/completed',(req,res,next)=>{
   allComplete=req.body.allComplete;
-  Task.updateMany({completed:!allComplete},{completed:allComplete})
+  Task.updateMany({completed:!allComplete,user:req.params.user}
+    ,{completed:allComplete})
   .then((result)=>{
     res.status(200).json({message:"many Task Updated"});
   });
 
 })
 
-app.patch('/:id',(req,res,next)=>{
-
+app.patch('/:user/:id',(req,res,next)=>{
   const updates=req.body;
-
-  Task.findOneAndUpdate({id:req.params.id},updates,{new:true},(err,doc)=>{
+  Task.findOneAndUpdate({id:req.params.id,user:req.params.user}
+    ,updates,{new:true},(err,doc)=>{
         res.status(200).json(doc);
     })
 })

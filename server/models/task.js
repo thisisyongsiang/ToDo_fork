@@ -6,6 +6,7 @@ const taskSchema=mongoose.Schema({
   completed:{type:Boolean,required: true},
   url:{type:String,required:false},
   id:{type:String,required:true},
-  order:{type:Number,required:false}
+  order:{type:Number,required:false},
+  user:{type:String,required:true}
 });
 module.exports = mongoose.model('Task',taskSchema);
